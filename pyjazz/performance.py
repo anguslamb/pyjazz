@@ -1,18 +1,24 @@
 from typing import List, Tuple
 
 from midiutil.MidiFile import MIDIFile
-
+from abc import ABC
 from pyjazz.chord import str_to_chord
 from pyjazz.song import Song
 from random import choice
 
 channel = 0
-volume = 100
-class Solo:
-
-    def __init__(self, song):
+class Performance(ABC):
+    def __init__(self, song: Song, volume: int = 100) -> None:
         self.song = song
-        self.prev_note = None
+        self.volume = volume
+        self.prev = None
+
+    def choose_note(self, chord):
+        pass
+
+    def play(self, midi_file, track, channel):
+        pass
+class Solo(Performance):
 
     def choose_note(self, chord):
         chord = str_to_chord(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
@@ -25,15 +31,15 @@ class Solo:
         notes.extend([i+12 for i in notes])
         notes = list(set(notes))
 
-        if self.prev_note is None:
+        if self.prev is None:
             note_choice = choice(notes)
         else:
-            note_distances = [(note, abs(note-self.prev_note)) for note in notes if abs(note-self.prev_note) != 0] 
+            note_distances = [(note, abs(note-self.prev)) for note in notes if abs(note-self.prev) != 0] 
             note_distances.sort(key=lambda x: x[1])
             note_choice= choice([note_distances[0][0], note_distances[1][0], note_distances[2][0]])
         return note_choice
 
-    def play_solo(self, midi_file, solo_track, solo_channel):  # num_repeats could be factored into song
+    def play(self, midi_file, track, channel):  # num_repeats could be factored into song
         solo = []
         position = 0
         while position < self.song.total_length:
@@ -45,33 +51,29 @@ class Solo:
                 duration = choice([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 2])  # can add method here for new policies
             #duration = choice([0.25, 0.5, 0.75, 1])
             solo.append((note, duration))
-            self.prev_note = note
+            self.prev = note
             position += duration
 
         position = 0
         for note, duration in solo:
-            midi_file.addNote(solo_track, solo_channel, note, position, duration, volume)
+            midi_file.addNote(track, channel, note, position, duration, self.volume)
             position += duration
 
-class Bassline:
-
-    def __init__(self, song):
-        self.song = song
-        self.prev_note = None
+class Bassline(Performance):
 
     def choose_note(self, chord):
         chord = str_to_chord(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
         notes = [i-12 for i in chord.root_fifth] + chord.root_fifth
 
-        if self.prev_note is None:
+        if self.prev is None:
             note_choice = notes[0]
         else:
-            note_distances = [(note, abs(note-self.prev_note)) for note in notes if abs(note-self.prev_note) != 0] 
+            note_distances = [(note, abs(note-self.prev)) for note in notes if abs(note-self.prev) != 0] 
             note_distances.sort(key=lambda x: x[1])
             note_choice= choice([note_distances[0][0], note_distances[1][0], note_distances[2][0]])
         return note_choice
 
-    def play_bassline(self, midi_file, bass_track, bass_channel):  # num_repeats could be factored into song
+    def play(self, midi_file, track, channel):  # num_repeats could be factored into song
         bassline = []
         position = 0
         while position < self.song.total_length:
@@ -79,19 +81,15 @@ class Bassline:
             note = self.choose_note(chord)
             duration = 1  # can add method here for new policies
             bassline.append((note, duration))
-            self.prev_note = note
+            self.prev = note
             position += duration
 
         position = 0
         for note, duration in bassline:
-            midi_file.addNote(bass_track, bass_channel, note, position, duration, volume)
+            midi_file.addNote(track, channel, note, position, duration, self.volume)
             position += duration
 
-class Comping:
-
-    def __init__(self, song):
-        self.song = song
-        self.prev_voicing = None
+class Comping(Performance):
 
     @staticmethod
     def voicing_distance(voicing1, voicing2):  #rename to voicing?
@@ -99,16 +97,16 @@ class Comping:
 
     def choose_voicing(self, chord):
         chord = str_to_chord(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
-        if self.prev_voicing == None:
+        if self.prev == None:
             voicing = choice(chord.voicings)
         else:
-            voicing_distances = [(voicing, self.voicing_distance(voicing, self.prev_voicing)) for voicing in chord.voicings]
+            voicing_distances = [(voicing, self.voicing_distance(voicing, self.prev)) for voicing in chord.voicings]
             voicing_distances.sort(key=lambda x: x[1])
             voicing = voicing_distances[0][0]
 
         return voicing
 
-    def play_comping(self, midi_file, comping_track, comping_channel):
+    def play(self, midi_file, track, channel):
         comping = []
         position = 0
         while position < self.song.total_length:
@@ -117,28 +115,11 @@ class Comping:
             # TODO default to full length of chord
             duration = self.song.get_duration_remaining(position)  # can add method here for new policies
             comping.append((voicing, duration))
-            self.prev_voicing = voicing
+            self.prev = voicing
             position += duration
 
         position = 0
         for voicing, duration in comping:
             for note in voicing:
-                midi_file.addNote(comping_track, comping_channel, note, position, duration, volume)
+                midi_file.addNote(track, channel, note, position, duration, self.volume)
             position += duration
-         
-#TODO make functions return a modified mf rather than modifying in-place
-def perform(song, mf):
-    comping_track = 0  #TODO these are defined at the top, pass them as args?
-    comping_channel = 0
-    comping = Comping(song)
-    comping.play_comping(mf, comping_track, comping_channel)
-
-    solo_track = 1  
-    solo_channel = 1
-    solo = Solo(song)
-    solo.play_solo(mf, solo_track, solo_channel)
-
-    bass_track = 2 
-    bass_channel = 2
-    bassline = Bassline(song)
-    bassline.play_bassline(mf, bass_track, bass_channel)
