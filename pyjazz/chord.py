@@ -25,7 +25,7 @@ class Min7(ChordType):
     root_fifth = [0, 7]
 
 class Min7b5(ChordType): #TODO
-    voicings = [(0, 3, 10, 14, 18), # A voicing
+    voicings = [(0, 3, 10, 13, 18), # A voicing
                  (0, 10, 15, 18, 26) # B voicing
     ]
     root_fifth = [0, 6]
