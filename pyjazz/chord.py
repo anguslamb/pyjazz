@@ -1,33 +1,36 @@
-class Quality:
+from dataclasses import dataclass
+
+@dataclass
+class ChordType:
     voicings = []
     arpeggio = []
     root_fifth = []
 
-class Maj7(Quality):
+class Maj7(ChordType):
     voicings =  [(0, 4, 11, 14, 19), # A voicing
                  (0, 11, 16, 19, 26) # B voicing
     ]
     arpeggio = [0, 4, 7, 10]
     root_fifth = [0, 7]
-class Dom7(Quality):
+class Dom7(ChordType):
     voicings =  [(0, 4, 10, 14, 21), # A voicing
                  (0, 10, 16, 21, 26) # B voicing
     ]
     root_fifth = [0, 7]
 
-class Min7(Quality):
+class Min7(ChordType):
     voicings =  [(0, 3, 10, 14, 19), # A voicing
                  (0, 10, 15, 19, 26) # B voicing
     ]
     root_fifth = [0, 7]
 
-class Min7b5(Quality): #TODO
+class Min7b5(ChordType): #TODO
     voicings = [(0, 3, 10, 14, 18), # A voicing
                  (0, 10, 15, 18, 26) # B voicing
     ]
     root_fifth = [0, 6]
 
-class Dim7(Quality):
+class Dim7(ChordType):
     voicings = [(0, 3, 9, 14, 18), # A voicing
                  (0, 9, 15, 18, 26) # B voicing
     ]
@@ -35,15 +38,15 @@ class Dim7(Quality):
 
 
 class Chord:
-    def __init__(self, root: int, quality: Quality):
+    def __init__(self, root: int, chord_type: ChordType):
         #0=A, 1=A# etc
         #TODO: note class?
 
         # Start from A octave below middle C
         self._root = 45 + root
  
-        self.voicings = [tuple([self._root + interval for interval in voicing]) for voicing in quality.voicings]
-        self.root_fifth = [self._root + interval for interval in quality.root_fifth]
+        self.voicings = [tuple([self._root + interval for interval in voicing]) for voicing in chord_type.voicings]
+        self.root_fifth = [self._root + interval for interval in chord_type.root_fifth]
         
 def str_to_chord(chord: str) -> Chord:
     root_str = chord[0]

@@ -1,0 +1,12 @@
+[project]
+name = "pyjazz"
+authors = [{name = "Angus Lamb"}]
+version = "0.1.0"
+description = "Procedurally generated jazz in Python."
+
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools"]
+
+[tool.setuptools.packages.find]
+where = ["pyjazz"]
