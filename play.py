@@ -1,23 +1,28 @@
 from midiutil.MidiFile import MIDIFile
 from pathlib import Path
 from pyjazz.song import Song
-from pyjazz.performance import Solo, Bassline, Comping, Performance
+from pyjazz.performance import Solo, Bassline, Comping, Performance, Drums
 from pyjazz.instrument import Instrument
 from typing import List
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 def create_midi_file(tempo: int, instruments: List[Instrument]) -> MIDIFile:
     mf = MIDIFile(numTracks=len(instruments)) 
     for i, instrument in enumerate(instruments):
         mf.addTrackName(track=i, time=0, trackName=instrument.name)
         mf.addTempo(track=i, time=0, tempo=tempo)
-        mf.addProgramChange(tracknum=i, channel=i, time=0, program=instrument.program)
+        logger.info(f'changing track {i} to program {instrument.program}')
+        mf.addProgramChange(tracknum=i, channel=0, time=0, program=instrument.program)
     return mf
 
          
 #TODO make functions return a modified mf rather than modifying in-place
 def perform(mf: MIDIFile, performances: List[Performance]):
     for i, performance in enumerate(performances):
-        performance.play(mf, i, i)
+        performance.play(mf, i)
 
 if __name__ == "__main__":
     GIANT_STEPS = [("BMaj7", 2), ("D7", 2), ("GMaj7", 2), ("Bb7", 2), ("EbMaj7", 4), ("AMin7", 2), ("D7", 2), 
@@ -42,13 +47,19 @@ if __name__ == "__main__":
     song = Song(AUTUMN_LEAVES, repeats=4)
 
     #TODO pass the song to the performance automatically
+    #TODO couple the instruments and performances in an enclosing class/tuple
     instruments = [
         Instrument("piano", 0), 
-        Instrument("saxophone", 66), 
-        Instrument("bass", 33)
+        # Instrument("saxophone", 66), 
+        Instrument("bass", 33),
+        Instrument("drums", 0)
     ]
 
-    performances = [Comping(song), Solo(song), Bassline(song)]
+    performances = [
+        Comping(song), 
+        #Solo(song), 
+        Bassline(song), 
+        Drums(song)]
 
     mf = create_midi_file(tempo=TEMPO, instruments=instruments)
     perform(mf, performances)
