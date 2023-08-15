@@ -6,7 +6,9 @@ from pyjazz.chord import str_to_chord
 from pyjazz.song import Song
 from random import choice
 import logging
-
+from pyjazz.motif import motifs, Motif
+from copy import deepcopy
+from chord import Chord
 logger = logging.getLogger(__name__)
 class Performance(ABC):
     channel = 0
@@ -40,26 +42,39 @@ class Solo(Performance):
             note_distances.sort(key=lambda x: x[1])
             note_choice= choice([note_distances[0][0], note_distances[1][0], note_distances[2][0]])
         return note_choice
+    
+    def choose_motif(self, chord: Chord) -> Motif:
+        quality_str = chord.quality.name
+   
+        #TODO find some way of returning new instances of a particular motif so that we don't have to copy here
+        valid_motifs = [deepcopy(m) for m in motifs if quality_str in m.chords]
+        octave_up_motifs = [deepcopy(m) for m in valid_motifs]
+        #TODO make transpose, move etc classmethods that return a new, modified instance of the motif
+        for motif in octave_up_motifs:
+            motif.transpose(12)
+        valid_motifs.extend(octave_up_motifs)
+        motif = choice(valid_motifs)
+
+        return motif
 
     def play(self, midi_file, track):  # num_repeats could be factored into song
         solo = []
         position = 0
         while position < self.song.total_length:
-            chord = self.song.get_current_chord(position)
-            note = self.choose_note(chord)
-            if position // 2 == 0:
-                duration = 0.5
-            else:
-                duration = choice([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 2])  # can add method here for new policies
-            #duration = choice([0.25, 0.5, 0.75, 1])
-            solo.append((note, duration))
-            self.prev = note
-            position += duration
+            #TODO this fn should return a Chord object
+            chord = str_to_chord(self.song.get_current_chord(position))
+            motif = self.choose_motif(chord)
+            #TODO remove implicit octave change in current chord root
+            motif.transpose(chord.root)
+            motif.move(position)
+            solo.append(motif)
+            self.prev = motif
+            position += motif.length
 
         position = 0
-        for note, duration in solo:
-            midi_file.addNote(track, self.channel, note, position, duration, self.volume)
-            position += duration
+        for motif in solo:
+            for note in motif:
+                midi_file.addNote(track, self.channel, note.pitch, note.position, note.duration, note.volume)
 
 class Bassline(Performance):
 

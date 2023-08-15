@@ -37,14 +37,14 @@ if __name__ == "__main__":
         ]
 
     N_REPEATS = 2
-    TEMPO = 120
+    TEMPO = 240
 
     OUTPUT_DIR = Path(__file__).parent / "outputs"
     OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
     OUTPUT_FILENAME = "out.mid"
     OUTPUT_PATH = OUTPUT_DIR / OUTPUT_FILENAME
 
-    song = Song(AUTUMN_LEAVES, repeats=4)
+    song = Song(GIANT_STEPS, repeats=4)
 
     #TODO pass the song to the performance automatically
     #TODO couple the instruments and performances in an enclosing class/tuple
