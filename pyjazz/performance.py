@@ -48,6 +48,8 @@ class Solo(Performance):
    
         #TODO find some way of returning new instances of a particular motif so that we don't have to copy here
         valid_motifs = [deepcopy(m) for m in motifs if quality_str in m.chords]
+        for motif in valid_motifs:
+            motif.transpose(12)
         octave_up_motifs = [deepcopy(m) for m in valid_motifs]
         #TODO make transpose, move etc classmethods that return a new, modified instance of the motif
         for motif in octave_up_motifs:
