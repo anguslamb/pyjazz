@@ -50,14 +50,14 @@ if __name__ == "__main__":
     #TODO couple the instruments and performances in an enclosing class/tuple
     instruments = [
         Instrument("piano", 0), 
-        # Instrument("saxophone", 66), 
+        Instrument("saxophone", 66), 
         Instrument("bass", 33),
         Instrument("drums", 0)
     ]
 
     performances = [
         Comping(song), 
-        #Solo(song), 
+        Solo(song), 
         Bassline(song), 
         Drums(song)]
 

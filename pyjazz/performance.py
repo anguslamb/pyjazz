@@ -88,7 +88,6 @@ class Bassline(Performance):
 
         position = 0
         for note, duration in bassline:
-            logger.debug(f"writing bass to track {track}")
             midi_file.addNote(track, self.channel, note, position, duration, self.volume)
             position += duration
 
