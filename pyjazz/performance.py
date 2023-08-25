@@ -5,8 +5,7 @@ from abc import ABC
 from pyjazz.song import Song
 from random import choice
 import logging
-from pyjazz.motif import motifs, Motif
-from copy import deepcopy
+from pyjazz.motif import motifs, Motif, bass_motifs
 from pyjazz.chord import Chord
 logger = logging.getLogger(__name__)
 
@@ -68,15 +67,14 @@ class Solo(Performance):
         while motif.high <= self.note_range[1]:
             if motif.low >= self.note_range[0]:
                 valid_transpositions.append(motif)
-            motif = deepcopy(motif)
-            motif.transpose(12)
+            motif = motif.transpose(12)
         return valid_transpositions
     
     def _choose_motif(self, chord: Chord) -> Motif:
         quality_str = chord.quality.name
    
         #TODO find some way of returning new instances of a particular motif so that we don't have to copy here
-        base_motifs = [deepcopy(m) for m in motifs if quality_str in m.chords]
+        base_motifs = [m for m in motifs if quality_str in m.chords]
 
         valid_motifs = []
         for base_motif in base_motifs:
@@ -89,32 +87,68 @@ class Solo(Performance):
 class Bassline(Performance):
     def __init__(self, song: Song, note_range: tuple[int, int], volume: int = 100) -> None:
         super().__init__(song, note_range, volume)
-        self.notes = []
+        # self.notes = []
+        # position = 0
+        # while position < self.song.total_length:
+        #     chord = self.song.get_current_chord(position)
+        #     note = self._choose_note(chord)
+        #     duration = 1  # can add method here for new policies
+        #     self.notes.append((note, duration))
+        #     self.prev = note
+        #     position += duration
+
+        self.motifs = []
         position = 0
         while position < self.song.total_length:
+            #TODO this fn should return a Chord object
             chord = self.song.get_current_chord(position)
-            note = self._choose_note(chord)
-            duration = 1  # can add method here for new policies
-            self.notes.append((note, duration))
-            self.prev = note
-            position += duration
+            motif = self._choose_motif(chord)
+            #TODO remove implicit octave change in current chord root
+            motif.transpose(chord.root)
+            motif.move(position)
+            self.motifs.append(motif)
+            self.prev = motif
+            position += motif.length
         
     def write_to_midi(self, midi_file: MIDIFile, track: int) -> None:
-        position = 0
-        for note, duration in self.notes:
-            midi_file.addNote(track, self.channel, note, position, duration, self.volume)
-            position += duration
+        # position = 0
+        # for note, duration in self.notes:
+        #     midi_file.addNote(track, self.channel, note, position, duration, self.volume)
+        #     position += duration
+        for motif in self.motifs:
+            for note in motif:
+                midi_file.addNote(track, self.channel, note.pitch, note.position, note.duration, note.volume)
 
-    def _choose_note(self, chord: Chord):
-        notes = [i+12 for i in chord.root_fifth] + chord.root_fifth
+    # def _choose_note(self, chord: Chord):
+    #     notes = [i+12 for i in chord.root_fifth] + chord.root_fifth
 
-        if self.prev is None:
-            note_choice = notes[0]
-        else:
-            note_distances = [(note, abs(note-self.prev)) for note in notes if abs(note-self.prev) != 0] 
-            note_distances.sort(key=lambda x: x[1])
-            note_choice= choice([note_distances[0][0], note_distances[1][0], note_distances[2][0]])
-        return note_choice
+    #     if self.prev is None:
+    #         note_choice = notes[0]
+    #     else:
+    #         note_distances = [(note, abs(note-self.prev)) for note in notes if abs(note-self.prev) != 0] 
+    #         note_distances.sort(key=lambda x: x[1])
+    #         note_choice= choice([note_distances[0][0], note_distances[1][0], note_distances[2][0]])
+    #     return note_choice
+
+    def _get_valid_transpositions(self, motif: Motif) -> List[Motif]:
+        valid_transpositions = []
+        while motif.high <= self.note_range[1]:
+            if motif.low >= self.note_range[0]:
+                valid_transpositions.append(motif)
+            motif = motif.transpose(12)
+        return valid_transpositions
+    
+    def _choose_motif(self, chord: Chord) -> Motif:
+        quality_str = chord.quality.name
+   
+        base_motifs = [m for m in bass_motifs if quality_str in m.chords]
+
+        valid_motifs = []
+        for base_motif in base_motifs:
+            valid_motifs.extend(self._get_valid_transpositions(base_motif))
+        motif = choice(valid_motifs)
+
+        return motif
 
 
 class Comping(Performance):

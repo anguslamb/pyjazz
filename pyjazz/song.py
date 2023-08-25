@@ -2,7 +2,7 @@ from pyjazz.chord import Chord
 import json
 
 class Song:
-    def __init__(self, chords: list[tuple[Chord, int]], repeats: int=1):
+    def __init__(self, chords: list[tuple[Chord, int]], repeats: int=1) -> None:
         self.chords = chords
         self.repeats = repeats
         self.song_length = sum(x[1] for x in self.chords)
@@ -26,10 +26,10 @@ class Song:
             chord_strs = json.load(f)
         return cls.from_chord_strs(chord_strs, repeats)
 
-    def get_current_chord(self, time):
+    def get_current_chord(self, time: float) -> Chord:
         time = time % self.song_length
         return(next(i[0] for i in self.chord_starts_stops if time < i[2]))
 
-    def get_duration_remaining(self, time):
+    def get_duration_remaining(self, time: float) -> float:
         time = time % self.song_length
         return(next(i[2]-time for i in self.chord_starts_stops if time < i[2]))

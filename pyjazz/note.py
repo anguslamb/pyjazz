@@ -7,10 +7,13 @@ class Note:
         self.volume = volume
 
     def transpose(self, interval: int) -> None:
-        self.pitch += interval
+        new_pitch = self.pitch + interval
+        return Note(new_pitch, self.position, self.duration, self.volume)
 
     def move(self, interval: int) -> None:
-        self.position += interval
+        new_position = self.position + interval
+        return Note(self.pitch, new_position, self.duration, self.volume)
 
     def stretch(self, scale_factor: float) -> None:
-        self.duration *= scale_factor
+        new_duration = self.duration * scale_factor
+        return Note(self.pitch, self.position, new_duration, self.volume)

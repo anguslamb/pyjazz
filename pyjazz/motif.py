@@ -1,5 +1,5 @@
 from pyjazz.note import Note
-
+from copy import copy
 class Motif:
     # TODO make transpose, move etc classmethods that return a new, modified instance of the motif
     def __init__(self, notes: list[Note], length: int, chords: list[str]):
@@ -19,16 +19,16 @@ class Motif:
     def high(self) -> int:
         return max(note.pitch for note in self.notes)
 
-    def transpose(self, interval: int) -> None:
-        for note in self.notes:
-            note.transpose(interval)
+    def transpose(self, interval: int) -> "Motif":
+        new_notes = [note.transpose(interval) for note in self.notes]
+        return Motif(new_notes, self.length, copy(self.chords))
 
-    def move(self, interval: int) -> None:
-        for note in self.notes:
-            note.move(interval)
+    def move(self, interval: int) -> "Motif":
+        new_notes = [note.move(interval) for note in self.notes]
+        return Motif(new_notes, self.length, copy(self.chords))
 
 #TODO use quality objects here rather than chord strings?
-MAJ7_UP = Motif(
+MAJ7_UP_8 = Motif(
     [
         Note(0, 0, 0.5),
         Note(4, 0.5, 0.5),
@@ -38,6 +38,7 @@ MAJ7_UP = Motif(
     2,
     ["MAJ7"]
 )
+
 
 MAJ7_DOWN = Motif(
     [
@@ -274,7 +275,11 @@ DIM_TRANE_DOWN = Motif(
 )
 
 motifs = [
-    MAJ7_UP, MAJ7_DOWN, DOM7_UP, DOM7_DOWN, MIN7_UP, MIN7_DOWN, MIN7B5_UP, MIN7B5_DOWN,
+    MAJ7_UP_8, MAJ7_DOWN, DOM7_UP, DOM7_DOWN, MIN7_UP, MIN7_DOWN, MIN7B5_UP, MIN7B5_DOWN,
     MAJ7_UP_9, MAJ7_DOWN_9, DOM7_UP_9, DOM7_DOWN_9, MIN7_UP_9, MIN7_DOWN_9, MIN7B5_UP_9, MIN7B5_DOWN_9,
     MAJ_TRANE_UP, MAJ_TRANE_DOWN, MIN_TRANE_UP, MIN_TRANE_DOWN, DIM_TRANE_UP, DIM_TRANE_DOWN
     ]
+
+bass_motifs = [
+    MAJ7_UP_8, MAJ7_DOWN, DOM7_UP, DOM7_DOWN, MIN7_UP, MIN7_DOWN, MIN7B5_UP, MIN7B5_DOWN, MAJ_TRANE_UP, MAJ_TRANE_DOWN, 
+    MIN_TRANE_UP, MIN_TRANE_DOWN, DIM_TRANE_UP, DIM_TRANE_DOWN]
