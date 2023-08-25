@@ -1,7 +1,8 @@
 from midiutil.MidiFile import MIDIFile
 from pathlib import Path
 from pyjazz.song import Song
-from pyjazz.performance import Solo, Bassline, Comping, Performance, Drums
+from pyjazz.performance import MotifPerformance, Comping, Performance, Drums
+from pyjazz.motif import motifs, bass_motifs
 from pyjazz.instrument import Instrument
 from typing import List
 import logging
@@ -26,7 +27,7 @@ def perform(mf: MIDIFile, performances: List[Performance]):
 
 if __name__ == "__main__":
     N_REPEATS = 2
-    TEMPO = 120
+    TEMPO = 200
 
     OUTPUT_DIR = Path(__file__).parent / "outputs"
     OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
@@ -45,9 +46,9 @@ if __name__ == "__main__":
     ]
 
     performances = [
-        Comping(song, (20,70)), 
-        Solo(song, (40,80)), 
-        Bassline(song, (8+12,35+12)), 
+        Comping(song, (20,60)), 
+        MotifPerformance(song, (40,80), motifs), 
+        MotifPerformance(song, (8+12,35+12), bass_motifs), 
         Drums(song, (-1,-1))]
 
     mf = create_midi_file(tempo=TEMPO, instruments=instruments)
