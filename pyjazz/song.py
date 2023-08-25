@@ -1,4 +1,5 @@
 from pyjazz.chord import Chord
+import json
 
 class Song:
     def __init__(self, chords: list[tuple[Chord, int]], repeats: int=1):
@@ -18,6 +19,12 @@ class Song:
     def from_chord_strs(cls, chord_strs: list[tuple[str, int]], repeats: int=1) -> "Song":
         chords = [(Chord.from_str(chord_str), duration) for (chord_str, duration) in chord_strs]
         return cls(chords, repeats)
+    
+    @classmethod
+    def from_json(cls, path: str, repeats: int=1) -> "Song":
+        with open(path, "r") as f:
+            chord_strs = json.load(f)
+        return cls.from_chord_strs(chord_strs, repeats)
 
     def get_current_chord(self, time):
         time = time % self.song_length

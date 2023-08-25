@@ -25,17 +25,6 @@ def perform(mf: MIDIFile, performances: List[Performance]):
         performance.write_to_midi(mf, i)
 
 if __name__ == "__main__":
-    GIANT_STEPS = [("BMaj7", 2), ("D7", 2), ("GMaj7", 2), ("Bb7", 2), ("EbMaj7", 4), ("AMin7", 2), ("D7", 2), 
-            ("GMaj7", 2), ("Bb7", 2), ("EbMaj7", 2), ("F#7", 2), ("BMaj7", 4), ("FMin7", 2), ("Bb7", 2), 
-            ("EbMaj7", 4), ("AMin7", 2), ("D7", 2), ("GMaj7", 4), ("C#Min7", 2), ("F#7", 2), 
-            ("BMaj7", 4), ("FMin7", 2), ("Bb7", 2), ("EbMaj7", 4), ("C#Min7", 2), ("F#7", 2), 
-    ]
-
-    AUTUMN_LEAVES = [
-        ("AMin7", 4), ("D7", 4), ("GMaj7", 4), ("CMaj7", 4),
-        ("F#Min7b5", 4), ("B7", 4), ("EMin7", 8)
-        ]
-
     N_REPEATS = 2
     TEMPO = 240
 
@@ -44,7 +33,7 @@ if __name__ == "__main__":
     OUTPUT_FILENAME = "out.mid"
     OUTPUT_PATH = OUTPUT_DIR / OUTPUT_FILENAME
 
-    song = Song.from_chord_strs(GIANT_STEPS, repeats=4)
+    song = Song.from_json("songs/giant_steps.json", repeats=4)
 
     #TODO pass the song to the performance automatically
     #TODO couple the instruments and performances in an enclosing class/tuple
