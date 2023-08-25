@@ -46,9 +46,6 @@ class Dim7(Quality):
 class Chord:
     def __init__(self, root: int, quality: Quality):
         #0=A, 1=A# etc
-        #TODO: note class?
-
-        # Start from A octave below middle C
         self.root = root
         self.quality = quality
  

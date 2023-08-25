@@ -44,7 +44,7 @@ if __name__ == "__main__":
     OUTPUT_FILENAME = "out.mid"
     OUTPUT_PATH = OUTPUT_DIR / OUTPUT_FILENAME
 
-    song = Song(GIANT_STEPS, repeats=4)
+    song = Song.from_chord_strs(GIANT_STEPS, repeats=4)
 
     #TODO pass the song to the performance automatically
     #TODO couple the instruments and performances in an enclosing class/tuple

@@ -17,7 +17,7 @@ class Performance(ABC):
         self.volume = volume
         self.prev = None
 
-    def write_to_midi(self, midi_file, track) -> None:
+    def write_to_midi(self, midi_file: MIDIFile, track: int) -> None:
         raise NotImplementedError
 
 class Solo(Performance):
@@ -28,7 +28,7 @@ class Solo(Performance):
         position = 0
         while position < self.song.total_length:
             #TODO this fn should return a Chord object
-            chord = chord.from_str(self.song.get_current_chord(position))
+            chord = self.song.get_current_chord(position)
             motif = self._choose_motif(chord)
             #TODO remove implicit octave change in current chord root
             motif.transpose(chord.root)
@@ -38,14 +38,13 @@ class Solo(Performance):
             position += motif.length
 
     
-    def write_to_midi(self, midi_file, track) -> None:
+    def write_to_midi(self, midi_file: MIDIFile, track: int) -> None:
         for motif in self.motifs:
             for note in motif:
                 midi_file.addNote(track, self.channel, note.pitch, note.position, note.duration, note.volume)
 
 
-    def _choose_note(self, chord):
-        chord = chord.from_str(chord)
+    def _choose_note(self, chord: Chord):
         notes = []
         list(map(notes.extend, chord.voicings))
         notes = list(set(notes))
@@ -92,15 +91,14 @@ class Bassline(Performance):
             self.prev = note
             position += duration
         
-    def write_to_midi(self, midi_file, track) -> None:
+    def write_to_midi(self, midi_file: MIDIFile, track: int) -> None:
         position = 0
         for note, duration in self.notes:
             midi_file.addNote(track, self.channel, note, position, duration, self.volume)
             position += duration
 
-    def _choose_note(self, chord):
-        chord = chord.from_str(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
-        notes = [i-12 for i in chord.root_fifth] + chord.root_fifth
+    def _choose_note(self, chord: Chord):
+        notes = [i+12 for i in chord.root_fifth] + chord.root_fifth
 
         if self.prev is None:
             note_choice = notes[0]
@@ -125,7 +123,7 @@ class Comping(Performance):
             self.prev = voicing
             position += duration
 
-    def write_to_midi(self, midi_file, track) -> None:
+    def write_to_midi(self, midi_file: MIDIFile, track: int) -> None:
         position = 0
         for voicing, duration in self.chords:
             for note in voicing:
@@ -137,8 +135,7 @@ class Comping(Performance):
     def _voicing_distance(voicing1, voicing2):
         return abs(voicing1[-1] - voicing2[-1])
 
-    def _choose_voicing(self, chord):
-        chord = chord.from_str(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
+    def _choose_voicing(self, chord: Chord):
         if self.prev == None:
             voicing = choice(chord.voicings)
         else:
@@ -152,7 +149,7 @@ class Comping(Performance):
 class Drums(Performance):
     channel = 9
 
-    def write_to_midi(self, midi_file, track) -> None:
+    def write_to_midi(self, midi_file: MIDIFile, track:int) -> None:
         # Ride
         # TODO probably easiest to replace patterns with simple lists of (position, note, duration) tuples/dataclasses
         pattern = [1, 2/3, 1/3]
