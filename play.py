@@ -22,7 +22,7 @@ def create_midi_file(tempo: int, instruments: List[Instrument]) -> MIDIFile:
 #TODO make functions return a modified mf rather than modifying in-place
 def perform(mf: MIDIFile, performances: List[Performance]):
     for i, performance in enumerate(performances):
-        performance.play(mf, i)
+        performance.write_to_midi(mf, i)
 
 if __name__ == "__main__":
     GIANT_STEPS = [("BMaj7", 2), ("D7", 2), ("GMaj7", 2), ("Bb7", 2), ("EbMaj7", 4), ("AMin7", 2), ("D7", 2), 
