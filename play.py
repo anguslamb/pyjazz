@@ -45,10 +45,10 @@ if __name__ == "__main__":
     ]
 
     performances = [
-        Comping(song), 
-        Solo(song), 
-        Bassline(song), 
-        Drums(song)]
+        Comping(song, (20,70)), 
+        Solo(song, (40,80)), 
+        Bassline(song, (20,60)), 
+        Drums(song, (-1,-1))]
 
     mf = create_midi_file(tempo=TEMPO, instruments=instruments)
     perform(mf, performances)

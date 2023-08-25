@@ -1,6 +1,7 @@
 from pyjazz.note import Note
 
 class Motif:
+    # TODO make transpose, move etc classmethods that return a new, modified instance of the motif
     def __init__(self, notes: list[Note], length: int, chords: list[str]):
         self.notes = notes
         #TODO enforce that actual motif length <= length
