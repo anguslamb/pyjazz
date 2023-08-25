@@ -20,6 +20,7 @@ class Performance(ABC):
     def write_to_midi(self, midi_file: MIDIFile, track: int) -> None:
         raise NotImplementedError
 
+
 class Solo(Performance):
     # idea - MotifPerformance class, can pass in tags that are matched on motifs in a library
     def __init__(self, song: Song, note_range: tuple[int, int], volume: int = 100) -> None:
@@ -28,12 +29,8 @@ class Solo(Performance):
         self.motifs = []
         position = 0
         while position < self.song.total_length:
-            #TODO this fn should return a Chord object
             chord = self.song.get_current_chord(position)
-            motif = self._choose_motif(chord)
-            #TODO remove implicit octave change in current chord root
-            motif.transpose(chord.root)
-            motif.move(position)
+            motif = self._choose_motif(chord).transpose(chord.root).move(position)
             self.motifs.append(motif)
             self.prev = motif
             position += motif.length
@@ -100,12 +97,8 @@ class Bassline(Performance):
         self.motifs = []
         position = 0
         while position < self.song.total_length:
-            #TODO this fn should return a Chord object
             chord = self.song.get_current_chord(position)
-            motif = self._choose_motif(chord)
-            #TODO remove implicit octave change in current chord root
-            motif.transpose(chord.root)
-            motif.move(position)
+            motif = self._choose_motif(chord).transpose(chord.root).move(position)
             self.motifs.append(motif)
             self.prev = motif
             position += motif.length
@@ -169,7 +162,7 @@ class Comping(Performance):
         position = 0
         for voicing, duration in self.chords:
             for note in voicing:
-                midi_file.addNote(track, self.channel, note, position, duration, self.volume)
+                midi_file.addNote(track, self.channel, note + 36, position, duration, self.volume)
             position += duration
 
 

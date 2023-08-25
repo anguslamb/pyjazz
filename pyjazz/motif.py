@@ -2,7 +2,7 @@ from pyjazz.note import Note
 from copy import copy
 class Motif:
     # TODO make transpose, move etc classmethods that return a new, modified instance of the motif
-    def __init__(self, notes: list[Note], length: int, chords: list[str]):
+    def __init__(self, notes: list[Note], length: float, chords: list[str]):
         self.notes = notes
         #TODO enforce that actual motif length <= length
         self.length = length
@@ -26,9 +26,13 @@ class Motif:
     def move(self, interval: int) -> "Motif":
         new_notes = [note.move(interval) for note in self.notes]
         return Motif(new_notes, self.length, copy(self.chords))
+    
+    def stretch(self, scale_factor: int) -> "Motif":
+        new_notes = [note.stretch(scale_factor).move_by_factor(scale_factor) for note in self.notes]
+        return Motif(new_notes, self.length * scale_factor, copy(self.chords))
 
 #TODO use quality objects here rather than chord strings?
-MAJ7_UP_8 = Motif(
+MAJ7_UP = Motif(
     [
         Note(0, 0, 0.5),
         Note(4, 0.5, 0.5),
@@ -38,6 +42,7 @@ MAJ7_UP_8 = Motif(
     2,
     ["MAJ7"]
 )
+
 
 
 MAJ7_DOWN = Motif(
@@ -51,6 +56,7 @@ MAJ7_DOWN = Motif(
     ["MAJ7"]
 )
 
+
 MAJ7_UP_9 = Motif(
     [
         Note(4, 0, 0.5),
@@ -61,6 +67,7 @@ MAJ7_UP_9 = Motif(
     2,
     ["MAJ7"]
 )
+
 
 MAJ7_DOWN_9 = Motif(
     [
@@ -275,11 +282,11 @@ DIM_TRANE_DOWN = Motif(
 )
 
 motifs = [
-    MAJ7_UP_8, MAJ7_DOWN, DOM7_UP, DOM7_DOWN, MIN7_UP, MIN7_DOWN, MIN7B5_UP, MIN7B5_DOWN,
+    MAJ7_UP, MAJ7_DOWN, DOM7_UP, DOM7_DOWN, MIN7_UP, MIN7_DOWN, MIN7B5_UP, MIN7B5_DOWN,
     MAJ7_UP_9, MAJ7_DOWN_9, DOM7_UP_9, DOM7_DOWN_9, MIN7_UP_9, MIN7_DOWN_9, MIN7B5_UP_9, MIN7B5_DOWN_9,
     MAJ_TRANE_UP, MAJ_TRANE_DOWN, MIN_TRANE_UP, MIN_TRANE_DOWN, DIM_TRANE_UP, DIM_TRANE_DOWN
     ]
 
-bass_motifs = [
-    MAJ7_UP_8, MAJ7_DOWN, DOM7_UP, DOM7_DOWN, MIN7_UP, MIN7_DOWN, MIN7B5_UP, MIN7B5_DOWN, MAJ_TRANE_UP, MAJ_TRANE_DOWN, 
-    MIN_TRANE_UP, MIN_TRANE_DOWN, DIM_TRANE_UP, DIM_TRANE_DOWN]
+bass_motifs = [MAJ7_UP, MAJ7_DOWN, DOM7_UP, DOM7_DOWN, MIN7_UP, MIN7_DOWN, MIN7B5_UP, MIN7B5_DOWN,
+    MAJ_TRANE_UP, MAJ_TRANE_DOWN, MIN_TRANE_UP, MIN_TRANE_DOWN, DIM_TRANE_UP, DIM_TRANE_DOWN]
+bass_motifs = [m.stretch(2) for m in bass_motifs]  # quarter notes for basslines
