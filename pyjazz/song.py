@@ -1,5 +1,4 @@
 class Song:
-
     def __init__(self, chords, repeats):
         self.chords = chords
         self.repeats = repeats

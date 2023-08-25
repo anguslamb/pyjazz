@@ -49,23 +49,24 @@ class Chord:
         #TODO: note class?
 
         # Start from A octave below middle C
-        self.root = 45 + root
+        self.root = root
         self.quality = quality
  
         self.voicings = [tuple([self.root + interval for interval in voicing]) for voicing in quality.voicings]
         self.root_fifth = [self.root + interval for interval in quality.root_fifth]
         
-def str_to_chord(chord: str) -> Chord:
-    root_str = chord[0]
-    if chord[1] in ["b", "#"]:
-        root_str += chord[1]
-        quality_str = chord[2:]
-    else:
-        quality_str = chord[1:]
-    
-    note_str_to_int = {"A": 0, "A#": 1, "Bb": 1, "B": 2, "C":3, "C#":4, "Db":4, "D": 5, "D#":6, "Eb":6, "E":7, "F":8, "F#":9, "Gb":9, "G":10, "G#":11, "Ab": 11}
-    root = note_str_to_int[root_str]
+    @classmethod
+    def from_str(cls, chord: str) -> "Chord":
+        root_str = chord[0]
+        if chord[1] in ["b", "#"]:
+            root_str += chord[1]
+            quality_str = chord[2:]
+        else:
+            quality_str = chord[1:]
+        
+        note_str_to_int = {"A": 0, "A#": 1, "Bb": 1, "B": 2, "C":3, "C#":4, "Db":4, "D": 5, "D#":6, "Eb":6, "E":7, "F":8, "F#":9, "Gb":9, "G":10, "G#":11, "Ab": 11}
+        root = note_str_to_int[root_str]
 
-    quality_str_to_class = {"MAJ7": Maj7, "MIN7": Min7, "DOM7": Dom7, "7": Dom7, "DIM7": Dim7, "MIN7B5": Min7b5}
-    quality = quality_str_to_class[quality_str.upper()]
-    return Chord(root, quality)  
+        quality_str_to_class = {"MAJ7": Maj7, "MIN7": Min7, "DOM7": Dom7, "7": Dom7, "DIM7": Dim7, "MIN7B5": Min7b5}
+        quality = quality_str_to_class[quality_str.upper()]
+        return cls(root, quality)  

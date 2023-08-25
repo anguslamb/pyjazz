@@ -2,13 +2,12 @@ from typing import List, Tuple
 
 from midiutil.MidiFile import MIDIFile
 from abc import ABC
-from pyjazz.chord import str_to_chord
 from pyjazz.song import Song
 from random import choice
 import logging
 from pyjazz.motif import motifs, Motif
 from copy import deepcopy
-from chord import Chord
+from pyjazz.chord import Chord
 logger = logging.getLogger(__name__)
 
 class Performance(ABC):
@@ -29,7 +28,7 @@ class Solo(Performance):
         position = 0
         while position < self.song.total_length:
             #TODO this fn should return a Chord object
-            chord = str_to_chord(self.song.get_current_chord(position))
+            chord = chord.from_str(self.song.get_current_chord(position))
             motif = self._choose_motif(chord)
             #TODO remove implicit octave change in current chord root
             motif.transpose(chord.root)
@@ -46,13 +45,12 @@ class Solo(Performance):
 
 
     def _choose_note(self, chord):
-        chord = str_to_chord(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
+        chord = chord.from_str(chord)
         notes = []
         list(map(notes.extend, chord.voicings))
         notes = list(set(notes))
         # TODO separate arpeggio or something to give dense collection of all allowed notes for solo purposes
         # maybe add a get_candidate_notes() method that gets all viable notes in a permitted range?
-        #notes = [note + 12 for note in notes]
         notes.extend([i+12 for i in notes])
         notes = list(set(notes))
 
@@ -101,7 +99,7 @@ class Bassline(Performance):
             position += duration
 
     def _choose_note(self, chord):
-        chord = str_to_chord(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
+        chord = chord.from_str(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
         notes = [i-12 for i in chord.root_fifth] + chord.root_fifth
 
         if self.prev is None:
@@ -140,7 +138,7 @@ class Comping(Performance):
         return abs(voicing1[-1] - voicing2[-1])
 
     def _choose_voicing(self, chord):
-        chord = str_to_chord(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
+        chord = chord.from_str(chord)  # TODO factor into chord? define what these interfaces should be (chords/voicings etc)
         if self.prev == None:
             voicing = choice(chord.voicings)
         else:
