@@ -3,7 +3,7 @@ from typing import List, Tuple
 from midiutil.MidiFile import MIDIFile
 from abc import ABC
 from pyjazz.song import Song
-from random import choice
+from random import choice, random
 import logging
 from pyjazz.motif import Motif
 from pyjazz.chord import Chord
@@ -95,6 +95,9 @@ class Comping(Performance):
     def write_to_midi(self, midi_file: MIDIFile, track: int) -> None:
         position = 0
         for voicing, duration in self.chords:
+            if random() < 0.2:
+                position += 2/3
+                duration -= 2/3
             for note in voicing:
                 midi_file.addNote(track, self.channel, note + 48, position, duration, self.volume)
             position += duration

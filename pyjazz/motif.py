@@ -32,6 +32,42 @@ class Motif:
         return Motif(new_notes, self.length * scale_factor, copy(self.chords))
 
 #TODO use quality objects here rather than chord strings?
+ROOT_FIFTH_UP = Motif(
+    [
+        Note(0, 0, 0.5),
+        Note(7, 0.5, 0.5),
+    ],
+    1,
+    ["MAJ7", "MIN7", "DOM7"]
+)
+
+ROOT_FIFTH_DOWN = Motif(
+    [
+        Note(12, 0, 0.5),
+        Note(7, 0.5, 0.5),
+    ],
+    1,
+    ["MAJ7", "MIN7", "DOM7"]
+)
+
+ROOT_FLAT_FIFTH_UP = Motif(
+    [
+        Note(0, 0, 0.5),
+        Note(6, 0.5, 0.5),
+    ],
+    1,
+    ["DIM7", "MIN7B5"]
+)
+
+ROOT_FLAT_FIFTH_DOWN = Motif(
+    [
+        Note(12, 0, 0.5),
+        Note(6, 0.5, 0.5),
+    ],
+    1,
+    ["DIM7", "MIN7B5"]
+)
+
 MAJ7_UP = Motif(
     [
         Note(0, 0, 0.5),
@@ -287,6 +323,7 @@ motifs = [
     MAJ_TRANE_UP, MAJ_TRANE_DOWN, MIN_TRANE_UP, MIN_TRANE_DOWN, DIM_TRANE_UP, DIM_TRANE_DOWN
     ]
 
-bass_motifs = [MAJ7_UP, MAJ7_DOWN, DOM7_UP, DOM7_DOWN, MIN7_UP, MIN7_DOWN, MIN7B5_UP, MIN7B5_DOWN,
+bass_motifs = [ROOT_FIFTH_UP, ROOT_FIFTH_DOWN, ROOT_FLAT_FIFTH_UP, ROOT_FLAT_FIFTH_DOWN, MAJ7_UP, 
+               MAJ7_DOWN, DOM7_UP, DOM7_DOWN, MIN7_UP, MIN7_DOWN, MIN7B5_UP, MIN7B5_DOWN,
     MAJ_TRANE_UP, MAJ_TRANE_DOWN, MIN_TRANE_UP, MIN_TRANE_DOWN, DIM_TRANE_UP, DIM_TRANE_DOWN]
 bass_motifs = [m.stretch(2) for m in bass_motifs]  # quarter notes for basslines
