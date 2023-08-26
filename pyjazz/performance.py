@@ -32,7 +32,8 @@ class MotifPerformance(Performance):
         position = 0
         while position < self.song.total_length:
             chord = self.song.get_current_chord(position)
-            motif = self._choose_motif(chord).transpose(chord.root).move(position)
+            duration = self.song.get_duration_remaining(position)
+            motif = self._choose_motif(chord, duration).transpose(chord.root).move(position)
             self.motifs.append(motif)
             self.prev = motif
             position += motif.length
@@ -59,10 +60,10 @@ class MotifPerformance(Performance):
         logger.debug(f"distance {distance}")
         return distance
     
-    def _choose_motif(self, chord: Chord) -> Motif:
+    def _choose_motif(self, chord: Chord, length: float) -> Motif:
         quality_str = chord.quality.name  # TODO use quality classes directly rather than strs
    
-        chord_motifs = [m for m in self.motif_set if quality_str in m.chords]
+        chord_motifs = [m for m in self.motif_set if quality_str in m.chords and m.length <= length]
 
         valid_motifs = []
         for base_motif in chord_motifs:

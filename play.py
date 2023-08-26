@@ -27,14 +27,14 @@ def perform(mf: MIDIFile, performances: List[Performance]):
 
 if __name__ == "__main__":
     N_REPEATS = 2
-    TEMPO = 200
+    TEMPO = 280
 
     OUTPUT_DIR = Path(__file__).parent / "outputs"
     OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
     OUTPUT_FILENAME = "out.mid"
     OUTPUT_PATH = OUTPUT_DIR / OUTPUT_FILENAME
 
-    song = Song.from_json("songs/autumn_leaves.json", repeats=4)
+    song = Song.from_json("songs/giant_steps.json", repeats=4)
 
     #TODO pass the song to the performance automatically
     #TODO couple the instruments and performances in an enclosing class/tuple
