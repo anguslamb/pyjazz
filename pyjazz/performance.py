@@ -57,7 +57,6 @@ class MotifPerformance(Performance):
         distance = abs(motif[0].pitch - last_note.pitch)
         if distance == 0:
             return 999
-        logger.debug(f"distance {distance}")
         return distance
     
     def _choose_motif(self, chord: Chord, length: float) -> Motif:
