@@ -4,7 +4,6 @@ from dataclasses import dataclass
 class Quality:
     name: str
     voicings = []
-    arpeggio = []
 
 
 class Maj7(Quality):
@@ -12,7 +11,6 @@ class Maj7(Quality):
     voicings =  [(0, 4, 11, 14, 19), # A voicing
                  (0, 11, 16, 19, 26) # B voicing
     ]
-    arpeggio = [0, 4, 7, 10]
 
 
 class Dom7(Quality):
