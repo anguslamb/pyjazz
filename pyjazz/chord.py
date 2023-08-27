@@ -5,7 +5,7 @@ class Quality:
     name: str
     voicings = []
     arpeggio = []
-    root_fifth = []
+
 
 class Maj7(Quality):
     name = "MAJ7"
@@ -13,34 +13,34 @@ class Maj7(Quality):
                  (0, 11, 16, 19, 26) # B voicing
     ]
     arpeggio = [0, 4, 7, 10]
-    root_fifth = [0, 7]
+
+
 class Dom7(Quality):
     name = "DOM7"
     voicings =  [(0, 4, 10, 14, 21), # A voicing
                  (0, 10, 16, 21, 26) # B voicing
     ]
-    root_fifth = [0, 7]
+
 
 class Min7(Quality):
     name = "MIN7"
     voicings =  [(0, 3, 10, 14, 19), # A voicing
                  (0, 10, 15, 19, 26) # B voicing
     ]
-    root_fifth = [0, 7]
+
 
 class Min7b5(Quality):
     name = "MIN7B5"
     voicings = [(0, 3, 10, 13, 18), # A voicing
                  (0, 10, 15, 18, 26) # B voicing
     ]
-    root_fifth = [0, 6]
+
 
 class Dim7(Quality):
     name = "DIM7"
     voicings = [(0, 3, 9, 14, 18), # A voicing
                  (0, 9, 15, 18, 26) # B voicing
     ]
-    root_fifth = [0, 6]
 
 
 class Chord:
@@ -50,7 +50,6 @@ class Chord:
         self.quality = quality
  
         self.voicings = [tuple([self.root + interval for interval in voicing]) for voicing in quality.voicings]
-        self.root_fifth = [self.root + interval for interval in quality.root_fifth]
         
     @classmethod
     def from_str(cls, chord: str) -> "Chord":
